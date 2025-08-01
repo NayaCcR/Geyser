@@ -60,6 +60,8 @@ import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.api.pack.PackCodec;
 import org.geysermc.geyser.api.pack.ResourcePack;
 import org.geysermc.geyser.api.pack.ResourcePackManifest;
+import org.geysermc.geyser.configuration.GeyserConfiguration;
+import org.geysermc.geyser.api.pack.UrlPackCodec;
 import org.geysermc.geyser.api.pack.option.ResourcePackOption;
 import org.geysermc.geyser.event.type.SessionLoadResourcePacksEventImpl;
 import org.geysermc.geyser.pack.GeyserResourcePack;
@@ -262,7 +264,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
                     session.authenticate(session.getAuthData().name());
                 } else if (!couldLoginUserByName(session.getAuthData().name())) {
                     // We must spawn the white world
-                    session.connect();
+                    session.connect();//Let bedrock user to login with online mode on
                 }
                 geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.connect", session.getAuthData().name()));
             }
@@ -308,6 +310,15 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
             if (authChain != null) {
                 geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().name()));
                 session.authenticateWithAuthChain(authChain);
+                return true;
+            }
+        }
+        if (geyser.getConfig().getUserAuths() != null) {
+            GeyserConfiguration.IUserAuthenticationInfo info = geyser.getConfig().getUserAuths().get(bedrockUsername);
+
+            if (info != null) {
+                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().name()));
+                session.authenticate(info.getEmail(), info.getPassword());
                 return true;
             }
         }

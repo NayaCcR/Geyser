@@ -21,11 +21,13 @@ dependencies {
 
     // These are NOT transitively included, and instead shadowed + relocated.
     // Avoids fabric complaining about non-SemVer versioning
-    shadowBundle(libs.protocol.connection)
-    shadowBundle(libs.protocol.common)
-    shadowBundle(libs.protocol.codec)
-    shadowBundle(libs.raknet)
-    shadowBundle(libs.mcprotocollib)
+    shadow(libs.protocol.connection)
+    shadow(libs.protocol.common)
+    shadow(libs.protocol.codec)
+    shadow(libs.mcauthlib)
+    shadow(libs.minecraftauth)
+    shadow(libs.raknet)
+    shadow(libs.mcprotocollib)
 
     // Since we also relocate cloudburst protocol: shade erosion common
     shadowBundle(libs.erosion.common)
