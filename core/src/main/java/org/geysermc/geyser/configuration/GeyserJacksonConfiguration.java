@@ -47,6 +47,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,8 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
     private String floodgateKeyFile = "key.pem";
 
     public abstract Path getFloodgateKeyPath();
+
+    private Map<String, UserAuthenticationInfo> userAuths;
 
     @JsonProperty("command-suggestions")
     private boolean commandSuggestions = true;
@@ -95,6 +98,12 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
 
     @JsonProperty("allow-third-party-capes")
     private boolean allowThirdPartyCapes = false;
+
+    @JsonProperty("auth-base-uri")
+    private String authBaseUri = "";
+
+    @JsonProperty("session-base-uri")
+    private String sessionBaseUri = "";
 
     @JsonProperty("show-cooldown")
     private String showCooldown = "title";
@@ -293,12 +302,29 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
         }
 
         @Getter
+        @JsonProperty("allow-password-authentication")
+        private boolean passwordAuthentication = true;
+
+        @Getter
         @JsonProperty("use-proxy-protocol")
         private boolean useProxyProtocol = false;
 
         @Getter
         @JsonProperty("forward-hostname")
         private boolean forwardHost = false;
+    }
+
+    @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true) // DO NOT REMOVE THIS! Otherwise, after we remove microsoft-account configs will not load
+    public static class UserAuthenticationInfo implements IUserAuthenticationInfo {
+        @AsteriskSerializer.Asterisk()
+        private String email;
+
+        @AsteriskSerializer.Asterisk()
+        private String password;
+
+        @JsonProperty("microsoft-account")
+        private boolean microsoftAccount = false;
     }
 
     @Getter
