@@ -17,7 +17,7 @@ dependencies {
     shadowBundle(projects.core)
     includeTransitive(projects.core)
 
-    // These are NOT transitively included, and instead shadowed + relocated.
+    // These are NOT transitively included, and instead shadowed (+ relocated, if not under the org.geyser namespace).
     // Avoids fabric complaining about non-SemVer versioning
     shadow(libs.protocol.connection)
     shadow(libs.protocol.common)
@@ -26,6 +26,11 @@ dependencies {
     shadow(libs.minecraftauth)
     shadow(libs.raknet)
     shadow(libs.mcprotocollib)
+
+    // Shade + relocate configurate as we're using a fork
+    shadowBundle(libs.configurate.`interface`)
+    shadowBundle(libs.configurate.yaml)
+    shadowBundle(libs.configurate.core)
 
     // Since we also relocate cloudburst protocol: shade erosion common
     shadowBundle(libs.erosion.common)
@@ -45,6 +50,7 @@ tasks.withType<Jar> {
 
 relocate("org.cloudburstmc.netty")
 relocate("org.cloudburstmc.protocol")
+relocate("org.spongepowered.configurate")
 
 tasks {
     remapJar {
@@ -53,6 +59,10 @@ tasks {
 
     remapModrinthJar {
         archiveBaseName.set("geyser-fabric")
+    }
+
+    shadowJar {
+        mergeServiceFiles()
     }
 }
 

@@ -105,7 +105,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
         super(geyser, session);
 
         ZlibCompression compression = new ZlibCompression(Zlib.RAW);
-        compression.setLevel(this.geyser.getConfig().getBedrock().getCompressionLevel());
+        compression.setLevel(this.geyser.config().advanced().bedrock().compressionLevel());
         this.compressionStrategy = new SimpleCompressionStrategy(compression);
     }
 
@@ -238,14 +238,17 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
             // Can happen if an error occurs in the resource pack event; that'll disconnect the player
             return PacketSignal.HANDLED;
         }
+        session.integratedPackActive(resourcePackLoadEvent.isIntegratedPackActive());
 
         ResourcePacksInfoPacket resourcePacksInfo = new ResourcePacksInfoPacket();
         resourcePacksInfo.getResourcePackInfos().addAll(this.resourcePackLoadEvent.infoPacketEntries());
         resourcePacksInfo.setVibrantVisualsForceDisabled(!session.isAllowVibrantVisuals());
 
-        resourcePacksInfo.setForcedToAccept(GeyserImpl.getInstance().getConfig().isForceResourcePacks());
+        resourcePacksInfo.setForcedToAccept(GeyserImpl.getInstance().config().gameplay().forceResourcePacks() ||
+            resourcePackLoadEvent.isIntegratedPackActive());
         resourcePacksInfo.setWorldTemplateId(UUID.randomUUID());
         resourcePacksInfo.setWorldTemplateVersion("*");
+
         session.sendUpstreamPacket(resourcePacksInfo);
 
         GeyserLocale.loadGeyserLocale(session.locale());
@@ -266,13 +269,14 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
         switch (packet.getStatus()) {
             case COMPLETED -> {
                 finishedResourcePackSending = true;
-                if (geyser.getConfig().getRemote().authType() != AuthType.ONLINE) {
+                if (geyser.config().java().authType() != AuthType.ONLINE) {
                     session.authenticate(session.getAuthData().name());
                 } else if (!couldLoginUserByName(session.getAuthData().name())) {
                     // We must spawn the white world
                     session.connect();//Let bedrock user to login with online mode on
                 }
-                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.connect", session.getAuthData().name()));
+                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.connect", session.getAuthData().name() +
+                    " (" + session.protocolVersion() + ")"));
             }
             case SEND_PACKS -> {
                 if (packet.getPackIds().isEmpty()) {
@@ -298,6 +302,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
 
                 session.sendUpstreamPacket(stackPacket);
             }
+            case REFUSED -> session.disconnect("disconnectionScreen.resourcePack");
             default -> {
                 GeyserImpl.getInstance().getLogger().debug("received unknown status packet: " + packet);
                 session.disconnect("disconnectionScreen.resourcePack");
@@ -317,7 +322,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
     }
 
     private boolean couldLoginUserByName(String bedrockUsername) {
-        if (geyser.getConfig().getSavedUserLogins().contains(bedrockUsername)) {
+        if (geyser.config().savedUserLogins().contains(bedrockUsername)) {
             String authChain = geyser.authChainFor(bedrockUsername);
             if (authChain != null) {
                 geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().name()));
@@ -436,7 +441,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
             // Also flushes packets
             // Avoids bursting slower / delayed clients
             session.sendUpstreamPacketImmediately(data);
-            GeyserImpl.getInstance().getScheduledThread().schedule(this::processNextChunk, PACKET_SEND_DELAY, TimeUnit.MILLISECONDS);
+            session.scheduleInEventLoop(this::processNextChunk, PACKET_SEND_DELAY, TimeUnit.MILLISECONDS);
         } else {
             session.sendUpstreamPacket(data);
         }
