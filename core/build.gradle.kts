@@ -40,8 +40,6 @@ dependencies {
     api(libs.mcprotocollib) {
         exclude("io.netty", "netty-all")
         exclude("net.raphimc", "MinecraftAuth")
-        exclude("com.github.GeyserMC", "packetlib")
-        exclude("com.github.GeyserMC", "mcauthlib")
     }
 
     implementation(libs.raknet) {
