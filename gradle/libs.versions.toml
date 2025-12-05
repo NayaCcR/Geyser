@@ -136,7 +136,6 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 gson-runtime = { group = "com.google.code.gson", name = "gson", version.ref = "gson-runtime" }
 gson-record-factory = { group = "com.github.Marcono1234", name = "gson-record-type-adapter-factory", version = "0.3.0" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
-mcauthlib = { group = "com.github.GeyserMC", name = "MCAuthLib", version.ref = "mcauthlib" }
 minecraftauth = { group = "net.raphimc", name = "MinecraftAuth", version.ref = "minecraftauth" }
 mcprotocollib = { group = "org.geysermc.mcprotocollib", name = "protocol", version.ref = "mcprotocollib" }
 raknet = { group = "org.cloudburstmc.netty", name = "netty-transport-raknet", version.ref = "raknet" }
