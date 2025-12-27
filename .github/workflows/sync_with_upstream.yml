@@ -2,7 +2,8 @@ name: Sync with Upstream
 
 on:
   schedule:
-    - cron: '0 0 */2 * *'
+    - cron: '0 0 */3 * *'
+    - cron: '0 12 */3 * *'
   workflow_dispatch:
 
 jobs:
@@ -32,6 +33,10 @@ jobs:
           echo "Merge conflict detected! Notifying for manual intervention."
           exit 1
         }
+
+    - name: Pull remote changes
+      run: |
+        git pull origin master --rebase
 
     - name: Check git status
       run: git status
