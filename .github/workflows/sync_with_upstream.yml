@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -20,32 +19,18 @@ jobs:
       run: |
         git config user.name 'NayaCcR'
         git config user.email 'xiaoyuccr@hotmail.com'
-        
-    - name: Add upstream remote
-      run: git remote add upstream https://github.com/GeyserMC/Geyser.git
 
-    - name: Fetch upstream changes
+    - name: Add upstream
+      run: git remote add upstream https://github.com/GeyserMC/Geyser.git || true
+
+    - name: Fetch upstream
       run: git fetch upstream
 
-    - name: Merge upstream changes
+    - name: Try merge upstream
+      id: merge
       run: |
-        git merge upstream/master || {
-          echo "Merge conflict detected! Notifying for manual intervention."
-          exit 1
-        }
-
-    - name: Pull remote changes
-      run: |
-        git pull origin master --rebase
-
-    - name: Check git status
-      run: git status
-
-    - name: Check git log
-      run: git log -1
-
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: 'master'
+        set +e
+        git merge --no-commit --no-ff upstream/master
+        status=$?
+        if [ $status -ne 0 ]; then
+          echo "merge_failed_
