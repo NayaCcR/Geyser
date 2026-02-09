@@ -129,7 +129,8 @@ public class LoginEncryptionUtils {
     private static void sendEncryptionFailedMessage(GeyserImpl geyser) {
         if (!HAS_SENT_ENCRYPTION_MESSAGE) {
             geyser.getLogger().warning(GeyserLocale.getLocaleStringLog("geyser.network.encryption.line_1"));
-            geyser.getLogger().warning(GeyserLocale.getLocaleStringLog("geyser.network.encryption.line_2", "https://geysermc.org/supported_java"));
+            geyser.getLogger().warning(GeyserLocale.getLocaleStringLog("geyser.network.encryption.line_2",
+                    "https://geysermc.org/supported_java"));
             HAS_SENT_ENCRYPTION_MESSAGE = true;
         }
     }
@@ -152,11 +153,11 @@ public class LoginEncryptionUtils {
                         .title("geyser.auth.login.form.notice.title")
                         .content("geyser.auth.login.form.notice.desc")
                         .optionalButton("geyser.auth.login.form.notice.btn_login.mojang", isPasswordAuthEnabled)
-                        .button("geyser.auth.login.form.notice.btn_login.microsoft")
+                        // .button("geyser.auth.login.form.notice.btn_login.microsoft")
                         .button("geyser.auth.login.form.notice.btn_disconnect")
                         .closedOrInvalidResultHandler(() -> buildAndShowLoginWindow(session))
                         .validResultHandler((response) -> {
-                            if (response.clickedButtonId() == 0){
+                            if (response.clickedButtonId() == 0) {
                                 buildAndShowLoginDetailsWindow(session);
                                 return;
                             }
@@ -166,14 +167,14 @@ public class LoginEncryptionUtils {
                                 return;
                             }
 
-
-
-                            session.disconnect(GeyserLocale.getPlayerLocaleString("geyser.auth.login.form.disconnect", session.locale()));
+                            session.disconnect(GeyserLocale.getPlayerLocaleString("geyser.auth.login.form.disconnect",
+                                    session.locale()));
                         }));
     }
 
     /**
-     * Build a window that explains the user's credentials will be saved to the system.
+     * Build a window that explains the user's credentials will be saved to the
+     * system.
      */
     public static void buildAndShowConsentWindow(GeyserSession session) {
         String locale = session.locale();
@@ -188,8 +189,7 @@ public class LoginEncryptionUtils {
                                 geyser.auth.login.save_token.proceed""")
                         .button("%gui.ok")
                         .button("%gui.decline")
-                        .resultHandler(authenticateOrKickHandler(session))
-        );
+                        .resultHandler(authenticateOrKickHandler(session)));
     }
 
     public static void buildAndShowTokenExpiredWindow(GeyserSession session) {
@@ -204,11 +204,11 @@ public class LoginEncryptionUtils {
 
                                 geyser.auth.login.save_token.proceed""")
                         .button("%gui.ok")
-                        .resultHandler(authenticateOrKickHandler(session))
-        );
+                        .resultHandler(authenticateOrKickHandler(session)));
     }
 
-    private static BiConsumer<SimpleForm, FormResponseResult<SimpleFormResponse>> authenticateOrKickHandler(GeyserSession session) {
+    private static BiConsumer<SimpleForm, FormResponseResult<SimpleFormResponse>> authenticateOrKickHandler(
+            GeyserSession session) {
         return (form, genericResult) -> {
             if (genericResult instanceof ValidFormResponseResult<SimpleFormResponse> result &&
                     result.response().clickedButtonId() == 0) {
@@ -218,6 +218,7 @@ public class LoginEncryptionUtils {
             }
         };
     }
+
     public static void buildAndShowLoginDetailsWindow(GeyserSession session) {
         session.sendForm(
                 CustomForm.builder()
@@ -248,7 +249,8 @@ public class LoginEncryptionUtils {
         if (timeout != 0) {
             message.append("\n\n")
                     .append(ChatColor.RESET)
-                    .append(GeyserLocale.getPlayerLocaleString("geyser.auth.login.timeout", session.locale(), String.valueOf(timeout)));
+                    .append(GeyserLocale.getPlayerLocaleString("geyser.auth.login.timeout", session.locale(),
+                            String.valueOf(timeout)));
         }
 
         session.sendForm(
@@ -260,14 +262,15 @@ public class LoginEncryptionUtils {
                         .closedOrInvalidResultHandler(() -> buildAndShowLoginWindow(session))
                         .validResultHandler((response) -> {
                             if (response.clickedButtonId() == 1) {
-                                session.disconnect(GeyserLocale.getPlayerLocaleString("geyser.auth.login.form.disconnect", locale));
+                                session.disconnect(GeyserLocale
+                                        .getPlayerLocaleString("geyser.auth.login.form.disconnect", locale));
                             }
-                        })
-        );
+                        }));
     }
 
     /*
-    This checks per line if there is something to be translated, and it skips Bedrock translation keys (%)
+     * This checks per line if there is something to be translated, and it skips
+     * Bedrock translation keys (%)
      */
     private static String translate(String key, String locale) {
         StringBuilder newValue = new StringBuilder();
