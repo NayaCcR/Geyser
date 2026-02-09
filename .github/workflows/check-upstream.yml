@@ -1,0 +1,38 @@
+name: Check Upstream Updates
+
+on:
+  schedule:
+    - cron: '0 0 */3 * *'
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/GeyserMC/Geyser.git || true
+
+      - name: Fetch upstream
+        run: git fetch upstream
+
+      - name: Check if upstream is ahead
+        run: |
+          LOCAL=$(git rev-parse origin/master)
+          UPSTREAM=$(git rev-parse upstream/master)
+
+          echo "Local   : $LOCAL"
+          echo "Upstream: $UPSTREAM"
+
+          if [ "$LOCAL" != "$UPSTREAM" ]; then
+            echo "::notice title=Upstream Update Detected::Upstream has new commits. Consider manual merge."
+          else
+            echo "Upstream is up to date."
+          fi
